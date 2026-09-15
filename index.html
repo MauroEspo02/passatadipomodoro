@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercoleterry — Passata di Cardito</title>
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Caveat:wght@600&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rosso:#c1272d;
+    --rosso-scuro:#8f1c21;
+    --inchiostro:#1c1a17;
+    --carta:#ffffff;
+    --oliva:#5b6b45;
+    --oro:#c9a86a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Archivo',sans-serif;
+    background:var(--carta);
+    color:var(--inchiostro);
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Kalam',cursive;font-weight:700;line-height:1.05;}
+  .script{font-family:'Caveat',cursive;}
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--oro);outline-offset:3px;}
+
+  /* ---------- INTRO ---------- */
+  #intro-overlay{
+    position:fixed;inset:0;z-index:1000;background:#000;
+    transition:opacity 1.1s ease, visibility 1.1s ease;
+  }
+  #intro-overlay iframe{
+    width:100%;height:100%;border:0;display:block;
+  }
+  #intro-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+  #skip-intro{
+    position:absolute;bottom:28px;right:28px;z-index:1001;
+    background:rgba(255,255,255,0.12);color:#fff;
+    border:1px solid rgba(255,255,255,0.5);
+    font-family:'Archivo',sans-serif;font-size:14px;letter-spacing:.02em;
+    padding:10px 20px;border-radius:999px;cursor:pointer;
+    backdrop-filter:blur(4px);
+  }
+  #skip-intro:hover{background:rgba(255,255,255,0.22);}
+
+  /* ---------- SQUIGGLE DIVIDER (dal bordo dell'etichetta) ---------- */
+  .squiggle{width:100%;height:14px;display:block;}
+  .squiggle path{fill:none;stroke:var(--rosso);stroke-width:2;}
+
+  /* ---------- HERO / BARATTOLO 3D ---------- */
+  .hero{
+    position:relative;min-height:100svh;background:var(--inchiostro);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:var(--carta);text-align:center;padding:40px 24px;
+  }
+  .hero .brand{
+    font-size:clamp(2.8rem,9vw,6rem);
+    color:var(--carta);
+    margin-bottom:6px;
+  }
+  .hero .tagline{
+    font-family:'Caveat',cursive;font-size:clamp(1.3rem,3vw,1.9rem);
+    color:var(--oro);margin-bottom:8px;
+  }
+  #jar-canvas-wrap{
+    width:min(520px,84vw);height:min(520px,52vh);
+    margin:18px auto 6px;cursor:grab;touch-action:none;
+  }
+  #jar-canvas-wrap:active{cursor:grabbing;}
+  #jar-canvas-wrap canvas{width:100%!important;height:100%!important;display:block;}
+  .drag-hint{
+    font-size:13px;letter-spacing:.03em;color:rgba(247,243,234,.6);
+  }
+  .loading-note{font-size:13px;color:rgba(247,243,234,.55);margin-top:18px;}
+
+  /* ---------- SEZIONI GENERALI ---------- */
+  .section{
+    padding:min(14vw,120px) 24px;
+    max-width:1100px;margin:0 auto;
+  }
+  .section h2{font-size:clamp(2rem,5vw,3.4rem);margin-bottom:.5em;}
+  .section p{font-size:1.05rem;line-height:1.65;max-width:62ch;}
+
+  /* ---------- PROVENIENZA ---------- */
+  .provenance{background:var(--carta);}
+  .prov-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;
+  }
+  .prov-card{border-left:3px solid var(--rosso);padding-left:22px;}
+  .prov-card h3{font-size:1.5rem;color:var(--rosso-scuro);margin-bottom:.4em;}
+  .prov-card p{font-size:.98rem;}
+  .prov-note{margin-top:52px;max-width:70ch;}
+  .prov-note p{font-size:1.1rem;}
+  @media(max-width:760px){.prov-grid{grid-template-columns:1fr;gap:36px;}}
+
+  /* ---------- PROCESSO ---------- */
+  .process{background:var(--inchiostro);color:var(--carta);}
+  .process h2{color:var(--carta);}
+  .process > p{color:rgba(247,243,234,.75);}
+  .steps{margin-top:48px;display:flex;flex-direction:column;}
+  .step{
+    display:grid;grid-template-columns:64px 1fr;gap:20px;
+    padding:26px 0;border-top:1px solid rgba(247,243,234,.15);
+  }
+  .step:last-child{border-bottom:1px solid rgba(247,243,234,.15);}
+  .step .num{font-family:'Kalam',cursive;font-size:1.8rem;color:var(--rosso);}
+  .step h3{font-size:1.25rem;margin-bottom:.3em;color:var(--carta);}
+  .step p{color:rgba(247,243,234,.72);font-size:.98rem;}
+
+  /* ---------- CRACKERS ---------- */
+  .crackers{background:var(--carta);}
+  .crackers-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;}
+  .crackers-visual{
+    aspect-ratio:1/1;border-radius:6px;background:
+      radial-gradient(circle at 30% 25%, #e2c98f 0 18%, transparent 19%),
+      radial-gradient(circle at 62% 55%, #e2c98f 0 15%, transparent 16%),
+      radial-gradient(circle at 45% 80%, #e2c98f 0 16%, transparent 17%),
+      radial-gradient(circle at 80% 22%, #e2c98f 0 13%, transparent 14%),
+      linear-gradient(135deg,#d9b25d,#c1272d 140%);
+    position:relative;
+  }
+  .crackers-visual::after{
+    content:'foto dei crackers — da sostituire';
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:rgba(28,26,23,.55);font-size:12px;letter-spacing:.03em;text-align:center;padding:20px;
+    background:rgba(247,243,234,.08);
+  }
+  @media(max-width:760px){.crackers-wrap{grid-template-columns:1fr;gap:32px;}}
+
+  /* ---------- ORDINA LA BOX ---------- */
+  .order{
+    background:var(--rosso);color:var(--carta);text-align:center;
+  }
+  .order h2{color:var(--carta);}
+  .order p{margin:0 auto 34px;color:rgba(247,243,234,.9);}
+  .order-btn{
+    display:inline-block;background:var(--inchiostro);color:var(--carta);
+    font-family:'Archivo',sans-serif;font-weight:600;font-size:1.05rem;
+    padding:18px 44px;border-radius:999px;text-decoration:none;
+    border:2px solid var(--inchiostro);transition:background .2s ease,color .2s ease;
+  }
+  .order-btn:hover{background:transparent;color:var(--inchiostro);}
+
+  footer{
+    background:var(--inchiostro);color:rgba(247,243,234,.5);
+    text-align:center;padding:26px;font-size:13px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+  }
+</style>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="intro-overlay">
+  <iframe src="intro.html" title="Intro Mercoleterry" allow="autoplay"></iframe>
+  <button id="skip-intro" type="button">Salta intro</button>
+</div>
+
+<main id="site">
+
+<header class="navigation"><a class="wordmark" href="#hero"><img class="brand-logo" src="logo-mercoleterry.png" alt="Mercoleterry" width="8673" height="1292"></a><nav aria-label="Navigazione principale"><a href="#provenienza">La nostra terra</a><a href="#processo">Il rituale</a><a class="nav-box" href="#ordina">La box ↗</a></nav></header>
+<section class="hero" id="hero">
+ <div class="hero-copy"><p class="eyebrow">DA CARDITO, CON CARATTERE.</p><h1>La provincia<br>ha un altro<br><em>sapore.</em></h1><p class="hero-description">Due pomodori, una terra sola.<br>La nostra storia, dentro un barattolo.</p><a class="primary-link" href="#provenienza">Scopri Mercoleterry <span>↘</span></a><button id="play-intro" class="intro-link" type="button">↖ Rivedi l’intro</button></div>
+ <div class="hero-art"><span class="art-caption">PASSATA DI CARDITO / MERCOLETERRY</span><div class="jar-stage"><div id="jar-canvas-wrap" tabindex="0" role="img" aria-label="Barattolo 3D: trascina o usa le frecce per ruotarlo"></div></div><span class="round-stamp">PASSATA<br>PROVINCIALE</span><p class="loading-note" id="loading-note" role="status">Il barattolo sta arrivando…</p><p class="drag-hint" id="drag-hint" hidden>↔ Trascina per esplorare il barattolo</p></div>
+ <div class="hero-bottom"><span>POMODORI. PAZIENZA. PROVINCIA.</span><a href="#provenienza">Il bello viene dalla terra ↓</a></div>
+</section>
+<div class="brand-divider" aria-hidden="true"><img src="linea.svg" alt=""></div>
+  <svg class="squiggle" viewBox="0 0 400 14" preserveAspectRatio="none"><path d="M0,7 Q10,0 20,7 T40,7 T60,7 T80,7 T100,7 T120,7 T140,7 T160,7 T180,7 T200,7 T220,7 T240,7 T260,7 T280,7 T300,7 T320,7 T340,7 T360,7 T380,7 T400,7"/></svg>
+
+  <!-- PROVENIENZA -->
+  <section class="section provenance" id="provenienza">
+    <p class="eyebrow">01 / LE RADICI</p><h2>Due pomodori.<br>Una terra sola.</h2>
+    <p>Dentro ogni barattolo ci sono due varietà, scelte una a una per quello che sanno fare: il datterino campano, dolce e carnoso, e il ciliegino della Terra dei Fuochi, quello che nessuno si aspetta.</p>
+
+    <div class="prov-grid" style="margin-top:54px;">
+      <div class="prov-card">
+        <h3>Datterino campano</h3>
+        <p>Piccolo, allungato, con la buccia sottile e la polpa piena. Cresce dove il pomodoro sa già di casa: matura al sole, si raccoglie a mano, grappolo per grappolo, solo quando è pronto davvero.</p>
+      </div>
+      <div class="prov-card">
+        <h3>Ciliegino della Terra dei Fuochi</h3>
+        <p>Rotondo, succoso, coltivato in un territorio che i telegiornali raccontano solo per i suoi problemi. Ma la terra, quella vera, continua a dare frutti eccellenti — e noi abbiamo deciso di raccontarla per quello, non per il resto.</p>
+      </div>
+    </div>
+
+    <div class="prov-note">
+      <p><span class="script" style="font-size:1.3em;color:var(--rosso-scuro);">Perché "provinciale" non è un difetto.</span><br>
+      È da lì che veniamo, ed è lì che torniamo ogni raccolta. Mercoleterry nasce apposta per ribaltare il racconto: un territorio giudicato dai titoli di giornale, restituito attraverso quello che sa fare meglio — coltivare bene, con pazienza, senza fretta.</p>
+    </div>
+  </section>
+
+  <!-- PROCESSO -->
+  <section class="section process" id="processo">
+    <p class="eyebrow">02 / IL RITUALE</p><h2>Le cose buone<br>hanno i loro tempi.</h2>
+    <p>Dalla raccolta al barattolo: ogni passaggio è parte della nostra storia.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div><h3>Raccolta</h3><p>I pomodori si raccolgono a mano, solo quelli giunti a maturazione. Niente forzature, niente acerbi in mezzo ai maturi.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div><h3>Lavaggio e selezione</h3><p>Si scartano i frutti danneggiati, si lavano gli altri e si dividono per varietà: datterini da un lato, ciliegini dall'altro.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div><h3>Cottura</h3><p>Cottura lenta, a fuoco basso, il tempo che serve perché la passata si addensi senza perdere il sapore fresco del pomodoro crudo.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div><h3>Invasettamento</h3><p>L’ultimo passaggio è il confezionamento: il raccolto prende la forma di un barattolo, pronto per la tua dispensa.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRACKERS DALLE BUCCE -->
+  <section class="section crackers" id="crackers">
+    <div class="crackers-wrap">
+      <div>
+        <p class="eyebrow">03 / FINO ALL’ULTIMA BUCCIA</p><h2>Il buono<br>che resta.</h2>
+        <p>Le bucce che restano dopo la cottura non finiscono nella spazzatura: vengono essiccate e trasformate in crackers di pomodoro, croccanti e saporiti — l'ultima cosa che nasce da ogni raccolta, prima di ricominciare da capo.</p>
+      </div>
+      <div class="crackers-visual"><img src="tomato.svg" alt="" width="120" height="140"><span>da buccia<br>a <em>crunch.</em></span><small>IL POMODORO HA ANCORA QUALCOSA DA DIRE.</small></div>
+    </div>
+  </section>
+
+  <svg class="squiggle" viewBox="0 0 400 14" preserveAspectRatio="none"><path d="M0,7 Q10,0 20,7 T40,7 T60,7 T80,7 T100,7 T120,7 T140,7 T160,7 T180,7 T200,7 T220,7 T240,7 T260,7 T280,7 T300,7 T320,7 T340,7 T360,7 T380,7 T400,7" stroke="#ffffff"/></svg>
+
+  <!-- ORDINA LA BOX -->
+  <section class="section order" id="ordina">
+    <h2>Vuoi provarla?</h2>
+    <p>La box Mercoleterry arriva con i due barattoli, l'etichetta che hai appena visto girare e i crackers dalle bucce, per assaggiare tutto il raccolto in una volta.</p>
+    <p class="availability">Le informazioni per ordinare saranno disponibili qui.</p>
+  </section>
+
+  <footer><a class="wordmark" href="#hero"><img class="brand-logo" src="logo-mercoleterry.png" alt="Mercoleterry" width="8673" height="1292"></a><span>Passata di Cardito. Orgogliosamente provinciale.</span><a href="#hero">Torna su ↑</a></footer>
+
+</main>
+
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+<script>
+(function(){
+  var overlay = document.getElementById('intro-overlay');
+  var iframe = overlay.querySelector('iframe');
+  var skipBtn = document.getElementById('skip-intro');
+  var replayBtn = document.getElementById('play-intro');
+  var dismissed = false;
+  var timer;
+  function dismissIntro(){
+    if(dismissed) return;
+    dismissed = true;
+    clearTimeout(timer);
+    overlay.classList.add('hidden');
+  }
+  function playIntro(){
+    dismissed = false;
+    overlay.classList.remove('hidden');
+    // Passare da about:blank forza un reload pulito anche se il browser
+    // vorrebbe riusare il documento già caricato (e il suo stato interno).
+    iframe.src = 'about:blank';
+    setTimeout(function(){ iframe.src = 'intro.html'; }, 0);
+    clearTimeout(timer);
+    timer = setTimeout(dismissIntro, 9000);
+  }
+  skipBtn.addEventListener('click', dismissIntro);
+  if (replayBtn) replayBtn.addEventListener('click', playIntro);
+  // Se l'intro non segnala mai la fine, la chiudiamo comunque dopo un tempo massimo.
+  timer = setTimeout(dismissIntro, 8000);
+  // Se il file dell'intro invia un messaggio di fine, lo intercettiamo.
+  window.addEventListener('message', function(e){
+    if(e && e.data === 'intro-complete') dismissIntro();
+  });
+})();
+</script>
+<script type="module" src="scene.js"></script></body></html>
