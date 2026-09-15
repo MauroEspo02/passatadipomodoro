@@ -214,11 +214,6 @@
 
   <!-- PROCESSO -->
   <section class="section process" id="processo">
-    <video class="process-bg" muted loop playsinline preload="metadata" poster="processo-bg-poster.jpg" aria-hidden="true">
-      <source src="processo-bg-portrait.mp4" media="(max-width:760px)">
-      <source src="processo-bg.mp4">
-    </video>
-    <div class="process-grid">
       <p class="eyebrow">02 / IL RITUALE</p><h2>Le cose buone<br>hanno i loro tempi.</h2>
       <p>Dalla raccolta al barattolo: ogni passaggio è parte della nostra storia.</p>
 
@@ -240,7 +235,6 @@
           <div><h3>Invasettamento</h3><p>L’ultimo passaggio è il confezionamento: il raccolto prende la forma di un barattolo, pronto per la tua dispensa.</p></div>
         </div>
       </div>
-    </div>
   </section>
 
   <!-- CRACKERS DALLE BUCCE -->
@@ -250,7 +244,7 @@
         <p class="eyebrow">03 / FINO ALL’ULTIMA BUCCIA</p><h2>Il buono<br>che resta.</h2>
         <p>Le bucce che restano dopo la cottura non finiscono nella spazzatura: vengono essiccate e trasformate in crackers di pomodoro, croccanti e saporiti — l'ultima cosa che nasce da ogni raccolta, prima di ricominciare da capo.</p>
       </div>
-      <div class="crackers-visual"><img src="tomato.svg" alt="" width="120" height="140"><span>da buccia<br>a <em>crunch.</em></span><small>IL POMODORO HA ANCORA QUALCOSA DA DIRE.</small></div>
+      <div class="crackers-visual"><img src="box-mercoleterry.webp" alt="La box Mercoleterry aperta, con crackers di pomodoro, il vasetto di passata e un vasetto piccolo" loading="lazy"></div>
     </div>
   </section>
 
@@ -295,20 +289,6 @@
   skipBtn.addEventListener('click', dismissIntro);
   if (replayBtn) replayBtn.addEventListener('click', playIntro);
   timer = setTimeout(dismissIntro, 2600);
-})();
-</script>
-<script>
-(function(){
-  var vids = document.querySelectorAll('.process-bg');
-  if (!vids.length || !('IntersectionObserver' in window)) return;
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      var v = entry.target;
-      if (entry.isIntersecting) v.play().catch(function(){});
-      else v.pause();
-    });
-  }, {threshold: 0.15});
-  vids.forEach(function(v){ io.observe(v); });
 })();
 </script>
 <script type="module" src="scene.js"></script></body></html>
