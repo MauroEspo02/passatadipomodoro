@@ -41,3 +41,7 @@ footer .brand-logo{filter:brightness(0) invert(1)}
 
 
 .brand-divider{width:100%;padding:22px 0;background:#fff;overflow:hidden}.brand-divider img{display:block;width:100%;height:24px}
+
+.process{position:relative;isolation:isolate}
+.process-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;filter:brightness(.55)}
+@media(prefers-reduced-motion:reduce){.process-bg{display:none}}
